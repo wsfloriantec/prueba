@@ -1,0 +1,82 @@
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<!------ Include the above in your HEAD tag ---------->
+
+<body>
+  <div id="login" *ngIf="visibleLogin">
+    <h3 class="text-center text-white pt-5">Login form</h3>
+    <div class="container">
+      <div id="login-row" class="row justify-content-center align-items-center">
+        <div id="login-column" class="col-md-6">
+          <div id="login-box" class="col-md-12">
+            <form id="login-form" class="form" action="" method="post">
+              <h3 class="text-center text-info">Login</h3>
+              <div class="form-group">
+                <label for="username" class="text-info">Correo:</label><br>
+                <input type="email" [(ngModel)]="correo" name="correo" class="form-control"
+                  placeholder="Ingrese correo del empleado">
+              </div>
+
+              <div class="form-group">
+                <button (click)="empleadoCargo()" class="btn btn-info btn-md">Ingresar</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="visibleEmp" class="container-fluid h-100">
+    <div *ngIf="empleado.CODEMPLEADO !== ''" class="row h-100">
+      <div class="card mb-2 col-lg-2 mt-2">
+        <h3 class="card-header">{{ empleado.NOMEMPLEADO }} {{empleado.APELLEMPLEADO}}</h3>
+        <div class="list-group list-group-flush">
+          <li class="list-group-item">Código: {{ empleado.CODEMPLEADO }}</li>
+          <li class="list-group-item">Correo: {{ empleado.CORREO }}</li>
+          <li class="list-group-item">Cargo: {{ empleado.IDTIPOCARGO }}</li>
+          <li class="list-group-item">Fecha de ingreso: {{ empleado.FECHAINGRE }}</li>
+
+        </div>
+        <div *ngIf="requerimientos.length > 0">
+          <ul class="list-group list-group-flush">
+            <li (click)="requerimientoSeleccionado(i)" *ngFor="let req of requerimientos; let i = index"
+              class="list-group-item reque">
+              Requerimiento: {{ req.CONSECREQUE }}
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div *ngIf="requeSelec !==-1" class="card mb-3 col-lg-8 row h-55 mx-auto mt-2">
+        <h3 class="card-header">Requerimiento: {{ requeSelec + 1 }}</h3>
+        <div class="list-group list-group-flush">
+          <li class="list-group-item">Código requerimiento: {{ requerimientos[requeSelec].CONSECREQUE }}</li>
+          <li class="list-group-item">Responsable: {{ requerimientos[requeSelec].EMP_CODEMPLEADO }}</li>
+          <li class="list-group-item">Descripción carrera: {{ requerimientos[requeSelec].DESCARRERAS }}</li>
+          <li class="list-group-item">Descripción función: {{ requerimientos[requeSelec].DESFUNCION }}</li>
+          <li class="list-group-item">Fecha de creación: {{ requerimientos[requeSelec].FECHAREQUE }}</li>
+          <li class="list-group-item">Número de vacantes: {{ requerimientos[requeSelec].NVVACANTES }}</li>
+        </div>
+        <div *ngIf="empleado.IDTIPOCARGO == 'ACL'" class="card-fooder mt-2">
+          <label>Selección analista:</label>
+          <select [(ngModel)]="idseleccionAG" (ngModelChange)="idseleccionAG = $event" class="form-control">
+            <option *ngFor="let opcion of analistaG" [value]="opcion.CODEMPLEADO">{{ opcion.NOMBRE }}</option>
+          </select>
+          <button (click)="enviarCorreo()" class="btn btn-primary mt-2">Enviar Correo</button>
+        </div>
+        <div *ngIf="empleado.IDTIPOCARGO == 'AG'" class="card-fooder mt-2">
+          <label>Selección disciplina:</label>
+          <select [(ngModel)]="idseleccionAG" (ngModelChange)="idseleccionAG = $event" class="form-control">
+            <option *ngFor="let opcion of analistaG" [value]="opcion.CODEMPLEADO">{{ opcion.NOMBRE }}</option>
+          </select>
+          <label>Selección perfil:</label>
+          <select [(ngModel)]="idseleccionAG" (ngModelChange)="idseleccionAG = $event" class="form-control">
+            <option *ngFor="let opcion of analistaG" [value]="opcion.CODEMPLEADO">{{ opcion.NOMBRE }}</option>
+          </select>
+          <button (click)="enviarCorreo()" class="btn btn-primary mt-2">Enviar Correo</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>

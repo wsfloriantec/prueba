@@ -14,8 +14,8 @@ export class EmpleadoService {
   constructor(private http: HttpClient) { }
 
   getEmpleado(correo: string): Observable<any> {
-    const params = { correo: correo };
-    return this.http.post<any>(this.URI, params);
+    const body = { correo: correo };
+    return this.http.post<any>(this.URI, body);
   }
 
   getEmpleadoAG(): Observable<any[]>{

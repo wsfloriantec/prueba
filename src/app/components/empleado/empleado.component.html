@@ -2,8 +2,9 @@
 <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <!------ Include the above in your HEAD tag ---------->
+<html lang="es">
 
-<body>
+<body class="page-container">
   <div id="login" *ngIf="visibleLogin">
     <h3 class="text-center text-white pt-5">Login form</h3>
     <div class="container">
@@ -30,7 +31,7 @@
 
   <div *ngIf="visibleEmp" class="container-fluid h-100">
     <div *ngIf="empleado.CODEMPLEADO !== ''" class="row h-100">
-      <div class="card mb-2 col-lg-2 mt-2">
+      <div class="card mb-2 col-lg-2 mt-2 mb-3">
         <h3 class="card-header">{{ empleado.NOMEMPLEADO }} {{empleado.APELLEMPLEADO}}</h3>
         <div class="list-group list-group-flush">
           <li class="list-group-item">Código: {{ empleado.CODEMPLEADO }}</li>
@@ -48,17 +49,19 @@
           </ul>
         </div>
       </div>
-      <div *ngIf="requeSelec !==-1" class="card mb-3 col-lg-8 row h-55 mx-auto mt-2">
-        <h3 class="card-header">Requerimiento: {{ requeSelec + 1 }}</h3>
+      <div *ngIf="requeSelec !==-1 && procesoReque === ''" class="card mb-3 col-lg-8 row h-60 mx-auto mt-2">
+        <h3 class="card-header">Requerimiento: {{ requerimientos[requeSelec].CONSECREQUE}}</h3>
         <div class="list-group list-group-flush">
           <li class="list-group-item">Código requerimiento: {{ requerimientos[requeSelec].CONSECREQUE }}</li>
           <li class="list-group-item">Responsable: {{ requerimientos[requeSelec].EMP_CODEMPLEADO }}</li>
           <li class="list-group-item">Descripción carrera: {{ requerimientos[requeSelec].DESCARRERAS }}</li>
           <li class="list-group-item">Descripción función: {{ requerimientos[requeSelec].DESFUNCION }}</li>
-          <li class="list-group-item">Fecha de creación: {{ requerimientos[requeSelec].FECHAREQUE }}</li>
+          <li class="list-group-item">Fecha de creación: {{ requerimientos[this.requeSelec].FECHAREQUE.split('T')[0]
+            }}</li>
           <li class="list-group-item">Número de vacantes: {{ requerimientos[requeSelec].NVVACANTES }}</li>
         </div>
-        <div *ngIf="empleado.IDTIPOCARGO == 'ACL'" class="card-fooder mt-2">
+        <div *ngIf="empleado.IDTIPOCARGO == 'ACL' && requerimientos[requeSelec].EMP_CODEMPLEADOAG == null"
+          class="card-fooder mt-2">
           <label>Selección analista:</label>
           <select [(ngModel)]="idseleccionAG" (ngModelChange)="idseleccionAG = $event" class="form-control">
             <option *ngFor="let opcion of analistaG" [value]="opcion.CODEMPLEADO">{{ opcion.NOMBRE }}</option>
@@ -67,16 +70,56 @@
         </div>
         <div *ngIf="empleado.IDTIPOCARGO == 'AG'" class="card-fooder mt-2">
           <label>Selección disciplina:</label>
-          <select [(ngModel)]="idseleccionAG" (ngModelChange)="idseleccionAG = $event" class="form-control">
-            <option *ngFor="let opcion of analistaG" [value]="opcion.CODEMPLEADO">{{ opcion.NOMBRE }}</option>
+          <select [(ngModel)]="discSelec" (change)="getPerfiles()" class="form-control">
+            <option *ngFor="let opcion of disciplinas" [value]="opcion.IDDISCIPLINA">{{ opcion.DESCDISCIPLINA }}
+            </option>
           </select>
           <label>Selección perfil:</label>
-          <select [(ngModel)]="idseleccionAG" (ngModelChange)="idseleccionAG = $event" class="form-control">
-            <option *ngFor="let opcion of analistaG" [value]="opcion.CODEMPLEADO">{{ opcion.NOMBRE }}</option>
+          <select [(ngModel)]="perfilSelec" (change)="setproceso()" class="form-control">
+            <option *ngFor="let opcion of perfiles" [value]="opcion.IDPERFIL">{{ opcion.DESPERFIL }}</option>
           </select>
-          <button (click)="enviarCorreo()" class="btn btn-primary mt-2">Enviar Correo</button>
+          <button (click)="generarProceso()" class="btn btn-primary mt-2">Empezar proceso</button>
+        </div>
+      </div>
+      <div *ngIf="procesoReque !== ''" class="card mb-3 col-lg-8 mx-auto mt-2">
+        <h3 class="card-header">Requerimiento: {{ requeSelec + 1 }}</h3>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-lg-4">
+              <h5>Fases:</h5>
+              <ul class="list-group">
+                <li class="list-group-item list-group-item-action border border-primary"
+                  *ngFor="let fase of perfilesFase"
+                  [ngClass]="{'disabled': fase.IDFASE > procesoReque.IDFASE, 'active': fase.IDFASE <= procesoReque.IDFASE}">
+                  Fase número: {{fase.IDFASE}}
+                </li>
+              </ul>
+            </div>
+            <div class="col-lg-8" *ngIf="this.procesoReque.CONVOCATORIA==null">
+              <div class="form-group">
+                <div class="info-div">
+                  <p>Información adicional aquí...</p>
+              </div>
+                <label for="exampleTextarea" class="form-label">Descripción convocatoria</label>
+                <textarea class="form-control" [(ngModel)]="textoIntro" rows="6"></textarea>
+              </div>
+              <button (click)="actualizarConvocatoria()" class="btn btn-primary mt-2">Enviar convocatoria</button>
+            </div>
+            <div class="col-lg-8" *ngIf="this.procesoReque.CONVOCATORIA!=null">
+              <div class="form-group">
+                <div class="info-div">
+                  <p>Información adicional aquí...</p>
+              </div>
+                <label for="exampleTextarea" class="form-label">Descripción invitación</label>
+                <textarea class="form-control" [(ngModel)]="textoIntro" rows="6"></textarea>
+              </div>
+              <button (click)="actualizarConvocatoria()" class="btn btn-primary mt-2">Enviar convocatoria</button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </body>
+
+</html>

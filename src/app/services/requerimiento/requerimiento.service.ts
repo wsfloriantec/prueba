@@ -22,10 +22,11 @@ export class RequerimientoService {
     return this.http.post<any[]>(this.URIAG, params);
   }
 
-  putIdAnalistaClient(consecreque:number ,idAnalistaC:string): Observable<any>{
+  putIdAnalista(consecreque:number ,idAnalistaC:string,idAnalistaG:string): Observable<any>{
     const body = {
       consecreque: consecreque,
-      emp_codempleadoac: idAnalistaC
+      emp_codempleadoac: idAnalistaC,
+      emp_codempleadoag: idAnalistaG
     };
     return this.http.put(this.URI, body);
   }
